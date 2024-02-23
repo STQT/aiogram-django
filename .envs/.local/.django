@@ -1,0 +1,22 @@
+# General
+# ------------------------------------------------------------------------------
+USE_DOCKER=yes
+IPYTHONDIR=/app/.ipython
+# Redis
+# ------------------------------------------------------------------------------
+REDIS_URL=redis://redis:6379/0
+
+# Celery
+# ------------------------------------------------------------------------------
+
+# Flower
+CELERY_FLOWER_USER=debug
+CELERY_FLOWER_PASSWORD=debug
+DJANGO_IMAGE_NAME=makro_channel_bot
+DJANGO_CONTAINER_NAME=makro_container_bot
+CELERY_WORKER_IMAGE_NAME=makro_local_worker
+CELERY_WORKER_CONTAINER_NAME=makro_local_cont
+CELERY_BEAT_IMAGE_NAME=makro_local_beat
+CELERY_BEAT_CONTAINER_NAME=makro_local_beat_cont
+BOT_IMAGE_NAME=makro_bot_local
+BOT_CONTAINER_NAME=makro_bot_local

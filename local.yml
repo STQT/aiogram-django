@@ -1,0 +1,93 @@
+version: '3'
+
+volumes:
+  makro_local_postgres_data: { }
+  makro_local_postgres_data_backups: { }
+
+services:
+  django: &django
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: "${DJANGO_IMAGE_NAME}"
+    container_name: "${DJANGO_CONTAINER_NAME}"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - .:/app:z
+    env_file:
+      - .env
+    ports:
+      - '8000:8000'
+    command: /start
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    image: "${POSTGRES_IMAGE_NAME}"
+    container_name: "${POSTGRES_CONTAINER_NAME}"
+    volumes:
+      - makro_local_postgres_data:/var/lib/postgresql/data
+      - makro_local_postgres_data_backups:/backups
+    env_file:
+      - .env
+
+  redis:
+    image: docker.io/redis:6
+    container_name: "${REDIS_CONTAINER_NAME}"
+
+  celeryworker:
+    <<: *django
+    image: "${CELERY_WORKER_IMAGE_NAME}"
+    container_name: "${CELERY_WORKER_CONTAINER_NAME}"
+    depends_on:
+      - redis
+      - postgres
+    ports: [ ]
+    command: /start-celeryworker
+
+  celerybeat:
+    <<: *django
+    image: "${CELERY_BEAT_IMAGE_NAME}"
+    container_name: "${CELERY_BEAT_CONTAINER_NAME}"
+    depends_on:
+      - redis
+      - postgres
+    ports: [ ]
+    command: /start-celerybeat
+
+  bot:
+    <<: *django
+    image: "${BOT_IMAGE_NAME}"
+    container_name: "${BOT_CONTAINER_NAME}"
+    depends_on:
+      - redis
+      - postgres
+    ports: [ ]
+    command: /start-bot
+
+#  flower:
+#    <<: *django
+#    image: app_local_flower
+#    container_name: app_local_flower
+#    ports:
+#      - '5555:5555'
+#    command: /start-flower
+
+#  docs:
+#    image: app_local_docs
+#    container_name: app_local_docs
+#    build:
+#      context: .
+#      dockerfile: ./compose/local/docs/Dockerfile
+#    env_file:
+#      - ./.envs/.local/.django
+#    volumes:
+#      - ./docs:/docs:z
+#      - ./config:/app/config:z
+#      - ./app:/app/app:z
+#    ports:
+#      - '9000:9000'
+#    command: /start-docs

@@ -1,0 +1,10 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=app
+POSTGRES_USER=debug
+POSTGRES_PASSWORD=debug
+POSTGRES_CONTAINER_NAME=makro_container
+POSTGRES_IMAGE_NAME=makro_image
+REDIS_CONTAINER_NAME=makro_redis

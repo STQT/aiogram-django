@@ -5,6 +5,10 @@ DJANGO_SETTINGS_MODULE=config.settings.production
 DJANGO_SECRET_KEY=VvTcQdnJY1t61kGWxMqLYIV3QHg0w7tl0hH8uASedGsBKTZ47TVVSmxZ9oa5mtjY
 DJANGO_ADMIN_URL=TOIvrS3Y97vn1HulJEdz2MWaxYKkItO8/
 DJANGO_ALLOWED_HOSTS=.promo.makromarket.uz
+HOST=
+TG_CHANNEL_LINK=
+TG_CHANNEL_ID=
+BOT_TOKEN=
 
 # Security
 # ------------------------------------------------------------------------------
@@ -40,4 +44,24 @@ REDIS_URL=redis://redis:6379/0
 CELERY_FLOWER_USER=debug
 CELERY_FLOWER_PASSWORD=debug
 
-BOT_TOKEN=
+# Docker Compose
+CELERY_FLOWER_USER=debug
+CELERY_FLOWER_PASSWORD=debug
+DJANGO_IMAGE_NAME=makro_channel_bot
+DJANGO_CONTAINER_NAME=makro_container_bot
+CELERY_WORKER_IMAGE_NAME=makro_local_worker
+CELERY_WORKER_CONTAINER_NAME=makro_local_cont
+CELERY_BEAT_IMAGE_NAME=makro_local_beat
+CELERY_BEAT_CONTAINER_NAME=makro_local_beat_cont
+BOT_IMAGE_NAME=makro_bot_local
+BOT_CONTAINER_NAME=makro_bot_local
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=app
+POSTGRES_USER=debug
+POSTGRES_PASSWORD=debug
+POSTGRES_CONTAINER_NAME=makro_container
+POSTGRES_IMAGE_NAME=makro_image
+REDIS_CONTAINER_NAME=makro_redis
+USE_DOCKER=yes
+IPYTHONDIR=/app/.ipython

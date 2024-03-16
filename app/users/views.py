@@ -47,19 +47,20 @@ def send_telegram(request, notification_id):
 
     notification.status = notification.NotificationStatus.PROCEED
     notification.save()
-    chunk_size = 200
+    chunk_size = 10
     offset = 0
+    all_chats_count = TelegramUser.objects.filter(is_active=True).count()
 
     first_task = None
 
     while True:
-        chunk_chats = TelegramUser.objects.filter(is_active=True).order_by('id')[offset:offset + chunk_size]
-
-        if not chunk_chats:
-            break
-
-        task = send_notifications_task.signature((notification_id, notification.description, media, offset, chunk_size),
-                                                 immutable=True)
+        limit = offset + chunk_size
+        is_last = False
+        if all_chats_count - limit <= chunk_size:
+            is_last = True
+        task = send_notifications_task.signature(
+            (notification_id, notification.description, media, offset, chunk_size, is_last),
+            immutable=True)
 
         if first_task:
             first_task |= task
@@ -67,6 +68,9 @@ def send_telegram(request, notification_id):
             first_task = task
 
         offset += chunk_size
+        if is_last is True:
+            break
+
     first_task.apply_async()
 
     return redirect(reverse('admin:users_notification_changelist'))

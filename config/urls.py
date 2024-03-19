@@ -8,7 +8,7 @@ from django.views.generic import TemplateView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.authtoken.views import obtain_auth_token
 
-from app.users.views import send_telegram
+from app.users.views import send_telegram, send_telegram_test
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
@@ -18,6 +18,7 @@ urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     # Your stuff: custom urls includes go here
     path('send_telegram/<int:notification_id>', send_telegram, name="send_notification"),
+    path('send_telegram_test/<int:notification_id>', send_telegram_test, name="send_notification_test"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 if settings.DEBUG:
     # Static file serving when using Gunicorn + Uvicorn for local web socket development

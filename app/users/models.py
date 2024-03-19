@@ -109,3 +109,11 @@ class PeriodicallyNotificationShots(models.Model):
     class Meta:
         verbose_name = "Изображение периодического оповещения "
         verbose_name_plural = "Изображения периодического оповещения "
+
+
+class AdminTelegramUsers(models.Model):
+    user_id = models.CharField()
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name

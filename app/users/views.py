@@ -9,7 +9,7 @@ from .serializers import UserSerializer
 
 from django.conf import settings
 
-from app.users.models import TelegramUser
+from app.users.models import TelegramUser, AdminTelegramUsers
 
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -35,7 +35,7 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
-def send_telegram(request, notification_id):
+def send_telegram(request, notification_id, user_ids=None):
     notification = get_object_or_404(Notification, id=notification_id)
     media = []
     cache_path = settings.MEDIA_ROOT + "/"
@@ -44,6 +44,9 @@ def send_telegram(request, notification_id):
         compressed_image = i.image_compress.url
         compressed_image_path = cache_path + compressed_image[len(settings.MEDIA_URL):]
         media.append(compressed_image_path)
+    if user_ids is not None:
+        send_notifications_task.delay(notification_id, notification.description, media, 0, 10, True)
+        return redirect(reverse('admin:users_notification_changelist'))
 
     notification.status = notification.NotificationStatus.PROCEED
     notification.save()
@@ -74,3 +77,8 @@ def send_telegram(request, notification_id):
     first_task.apply_async()
 
     return redirect(reverse('admin:users_notification_changelist'))
+
+
+def send_telegram_test(request, notification_id):
+    user_ids = AdminTelegramUsers.objects.all()
+    return send_telegram(request, notification_id, user_ids)

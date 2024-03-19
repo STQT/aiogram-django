@@ -45,7 +45,7 @@ def send_telegram(request, notification_id, is_test=False):
         compressed_image_path = cache_path + compressed_image[len(settings.MEDIA_URL):]
         media.append(compressed_image_path)
     if is_test is True:
-        send_notifications_test.delay(notification_id, notification.description, media)
+        send_notifications_test.delay(notification.description, media)
         return redirect(reverse('admin:users_notification_changelist'))
 
     notification.status = notification.NotificationStatus.PROCEED
@@ -80,5 +80,4 @@ def send_telegram(request, notification_id, is_test=False):
 
 
 def send_telegram_test(request, notification_id):
-
     return send_telegram(request, notification_id, is_test=True)

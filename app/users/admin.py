@@ -109,7 +109,7 @@ class NotificationAdmin(TabbedTranslationAdmin):
     tools_column.allow_tags = True
 
     def short_description(self, obj):
-        descr = striptags(obj.description)
+        descr = striptags(obj.description_ru)
         return descr[:100] + "..."
 
     short_description.short_description = "Описание"

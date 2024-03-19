@@ -146,7 +146,10 @@ def send_notifications_test(text_uz, text_ru, media):
     text_ru = text_ru.replace("<br />", "\n")
     for chat in chunk_chats:
         send_notification_bound = send_media_group if media else send_notifications_text
-        send_notification_bound(text=text_uz if chat.language == 'uz' else text_ru,
+        send_notification_bound(text=text_uz,
+                                chat_id=chat.user_id, media=media)
+        time.sleep(0.035)
+        send_notification_bound(text=text_ru,
                                 chat_id=chat.user_id, media=media)
         time.sleep(0.035)
 

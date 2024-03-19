@@ -18,7 +18,7 @@ from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.db.models import F
 
-from app.users.models import TelegramUser, Notification, PeriodicallyNotification
+from app.users.models import TelegramUser, Notification, PeriodicallyNotification, AdminTelegramUsers
 from bot.utils.storage import DjangoRedisStorage
 from bot.filters.states import Registration
 from bot.misc import bot, bot_session
@@ -136,6 +136,15 @@ def send_notifications_task(notification_id, text, media, offset, chunk_size, is
             status=Notification.NotificationStatus.SENDED if is_last else Notification.NotificationStatus.PROCEED
         )
 
+
+@shared_task()
+def send_notifications_test(text, media):
+    chunk_chats = AdminTelegramUsers.objects.all()
+    text = text.replace("<br />", "\n")
+    for chat in chunk_chats:
+        send_notification_bound = send_media_group if media else send_notifications_text
+        send_notification_bound(text=text, chat_id=chat.user_id, media=media)
+        time.sleep(0.035)
 
 # @shared_task()
 # def scheduled_send_periodically_notification():

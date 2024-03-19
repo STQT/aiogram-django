@@ -15,7 +15,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 
 from .models import Notification
-from .tasks import send_notifications_task
+from .tasks import send_notifications_task, send_notifications_test
 
 User = get_user_model()
 
@@ -35,7 +35,7 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
-def send_telegram(request, notification_id, user_ids=None):
+def send_telegram(request, notification_id, is_test=False):
     notification = get_object_or_404(Notification, id=notification_id)
     media = []
     cache_path = settings.MEDIA_ROOT + "/"
@@ -44,8 +44,8 @@ def send_telegram(request, notification_id, user_ids=None):
         compressed_image = i.image_compress.url
         compressed_image_path = cache_path + compressed_image[len(settings.MEDIA_URL):]
         media.append(compressed_image_path)
-    if user_ids is not None:
-        send_notifications_task.delay(notification_id, notification.description, media, 0, 10, True)
+    if is_test is True:
+        send_notifications_test.delay(notification_id, notification.description, media)
         return redirect(reverse('admin:users_notification_changelist'))
 
     notification.status = notification.NotificationStatus.PROCEED
@@ -80,5 +80,5 @@ def send_telegram(request, notification_id, user_ids=None):
 
 
 def send_telegram_test(request, notification_id):
-    user_ids = AdminTelegramUsers.objects.all()
-    return send_telegram(request, notification_id, user_ids)
+
+    return send_telegram(request, notification_id, is_test=True)

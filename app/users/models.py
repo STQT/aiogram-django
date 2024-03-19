@@ -114,6 +114,7 @@ class PeriodicallyNotificationShots(models.Model):
 class AdminTelegramUsers(models.Model):
     user_id = models.CharField()
     name = models.CharField(max_length=100)
+    language = models.CharField(max_length=2, default='uz')
 
     def __str__(self):
         return self.name

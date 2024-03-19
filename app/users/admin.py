@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from django import forms
 from django.contrib import admin
+from modeltranslation.admin import TabbedTranslationAdmin
 
 from app.users.models import Notification, NotificationShots, PeriodicallyNotification, PeriodicallyNotificationShots, \
     AdminTelegramUsers
@@ -61,11 +62,18 @@ class PeriodicallyNotificationShotsInline(admin.TabularInline):
 
 
 class NotificationAdminForm(forms.ModelForm):
-    description = forms.CharField(widget=CustomCKEditorWidget())
+    description_ru = forms.CharField(widget=CustomCKEditorWidget())
+    description_uz = forms.CharField(widget=CustomCKEditorWidget())
 
     class Meta:
         model = Notification
         fields = '__all__'
+
+    def clean(self):
+        if self.instance.description_ru and len(self.instance.description_ru) > 1023:
+            raise forms.ValidationError("Размер текста очень большой")
+        if self.instance.description_uz and len(self.instance.description_uz) > 1023:
+            raise forms.ValidationError("Размер текста очень большой")
 
 
 class PeriodicallyNotificationForm(forms.ModelForm):
@@ -77,7 +85,7 @@ class PeriodicallyNotificationForm(forms.ModelForm):
 
 
 @admin.register(Notification)
-class NotificationAdmin(admin.ModelAdmin):
+class NotificationAdmin(TabbedTranslationAdmin):
     list_display = ["short_description", "display_image",
                     "all_chats_count", "created_at", "tools_column"]
     inlines = [NotificationShotsInline]

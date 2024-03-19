@@ -120,12 +120,14 @@ def send_notifications_text(text, chat_id, media=None):
 
 
 @shared_task()
-def send_notifications_task(notification_id, text, media, offset, chunk_size, is_last, is_test=False):
+def send_notifications_task(notification_id, text_uz, text_ru, media, offset, chunk_size, is_last, is_test=False):
     chunk_chats = TelegramUser.objects.filter(is_active=True).order_by('id')[offset:offset + chunk_size]
-    text = text.replace("<br />", "\n")
+    text_uz = text_uz.replace("<br />", "\n")
+    text_ru = text_ru.replace("<br />", "\n")
     for chat in chunk_chats:
         send_notification_bound = send_media_group if media else send_notifications_text
-        response = send_notification_bound(text=text, chat_id=chat.id, media=media)
+        response = send_notification_bound(text=text_uz if chat.language == 'uz' else text_ru,
+                                           chat_id=chat.id, media=media)
         time.sleep(0.035)
         if response != 200:
             chat.is_active = False  # Reset is_stopped flag if the message was sent successfully
@@ -138,12 +140,14 @@ def send_notifications_task(notification_id, text, media, offset, chunk_size, is
 
 
 @shared_task()
-def send_notifications_test(text, media):
+def send_notifications_test(text_uz, text_ru, media):
     chunk_chats = AdminTelegramUsers.objects.all()
-    text = text.replace("<br />", "\n")
+    text_uz = text_uz.replace("<br />", "\n")
+    text_ru = text_ru.replace("<br />", "\n")
     for chat in chunk_chats:
         send_notification_bound = send_media_group if media else send_notifications_text
-        send_notification_bound(text=text, chat_id=chat.user_id, media=media)
+        send_notification_bound(text=text_uz if chat.language == 'uz' else text_ru,
+                                chat_id=chat.user_id, media=media)
         time.sleep(0.035)
 
 # @shared_task()

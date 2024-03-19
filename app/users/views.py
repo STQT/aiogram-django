@@ -45,7 +45,7 @@ def send_telegram(request, notification_id, is_test=False):
         compressed_image_path = cache_path + compressed_image[len(settings.MEDIA_URL):]
         media.append(compressed_image_path)
     if is_test is True:
-        send_notifications_test.delay(notification.description, media)
+        send_notifications_test.delay(notification.description_uz, notification.description_ru, media)
         return redirect(reverse('admin:users_notification_changelist'))
 
     notification.status = notification.NotificationStatus.PROCEED
@@ -55,14 +55,14 @@ def send_telegram(request, notification_id, is_test=False):
     all_chats_count = TelegramUser.objects.filter(is_active=True).count()
 
     first_task = None
-
     while True:
         limit = offset + chunk_size
         is_last = False
         if all_chats_count - limit <= chunk_size:
             is_last = True
         task = send_notifications_task.signature(
-            (notification_id, notification.description, media, offset, chunk_size, is_last),
+            (notification_id, notification.description_uz, notification.description_ru,
+             media, offset, chunk_size, is_last),
             immutable=True)
 
         if first_task:
